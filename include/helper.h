@@ -5,4 +5,7 @@
 #include <stdlib.h>
 
 
-char * parseCommandLine() 
+char * parseCommandLine(FILE* fp, size_t baseLength);
+
+
+#endif
