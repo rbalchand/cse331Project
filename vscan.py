@@ -1,5 +1,7 @@
 from sys import argv
 import os
+import urllib.request
+import array
 
 def getListOfFiles(dirName):
     # create a list of file and sub directories 
@@ -21,18 +23,29 @@ def getListOfFiles(dirName):
 def main():
 	route = argv[1]
 
-	virus = b'\x03\x00\x00\x80\x02\x00\x00\x00\x0f\x00\x00'
+	temp = []
+	with open("virus_base.txt","r") as f:
+		line = f.readline().rstrip()
+		while line:
+			temp.append(line)
+			line = f.readline().rstrip()
+	virus = []	
+	for v in temp:
+		virus.append(bytes.fromhex(v))
 
 
+	
 	if os.path.isfile(route):
 		size = os.path.getsize(route)
 		with open(route,"rb") as f:
-				byte = f.read(len(virus))
+			for v in virus:
+				byte = f.read(len(v))
 				for i in range(1,size+1):
-					if byte == virus:
-						print("found")
+					if byte == v:
+						print(route)
+						print("found virus",v)
 					f.seek(i)
-					byte = f.read(len(virus))
+					byte = f.read(len(v))
 
 
 	elif os.path.isdir(route):
@@ -40,13 +53,17 @@ def main():
 		for elem in listOfFile:
 			size = os.path.getsize(elem)
 			with open(elem,"rb") as f:
-				byte = f.read(len(virus))
-				for i in range(1,size+1):
-					if byte == virus:
-						print("found")
-					f.seek(i)
-					byte = f.read(len(virus))
+				for v in virus:
+					byte = f.read(len(v))
+					for i in range(1,size+1):
+						if byte == v:
+							print(elem)
+							print("found virus",v)
+						f.seek(i)
+						byte = f.read(len(v))
 
+	else:
+		print("Directory Invalid")
 
 if __name__ == '__main__':
     main()

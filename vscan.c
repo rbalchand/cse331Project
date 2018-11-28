@@ -8,7 +8,7 @@
 int scanVirus(char filename[], char sequence[])
 {
     size_t bytes_read;
-    FILE *fp = fopen(filename,"r");
+    FILE *fp = fopen(filename,"rb");
     
     int size_sequence = 0;
     if(fp == NULL){
@@ -29,39 +29,27 @@ int scanVirus(char filename[], char sequence[])
     return 0;
     
 }
-
-void scanDir(char *basePath)
+void listdir(const char *name,char sequence[])
 {
-    char path[1000];
-    struct dirent *dp;
-    DIR *dir = opendir(basePath);
+    DIR *dir;
+    struct dirent *entry;
 
-    // Unable to open directory stream
-    if (!dir)
+    if (!(dir = opendir(name)))
         return;
 
-    while ((dp = readdir(dir)) != NULL)
-    {
-        if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0)
-        {
-            
-            //Here is the comparing algorithm we should put for the file
-            printf("%s\n", dp->d_name);
-            scanVirus(dp->d_name, "ok");
-            // Construct new path from our base path
-            strcpy(path, basePath);
-            strcat(path, "/");
-            strcat(path, dp->d_name);
-
-            scanDir(path);
-        }
+    while ((entry = readdir(dir)) != NULL) {
+            char path[1024];
+            if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+                continue;
+            snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
+            printf("%s\n", entry->d_name,sequence);
+            listdir(path);
     }
-
     closedir(dir);
 }
 
- int main (int argc, char* argv[])
+int main (int argc, char* argv[])
 {
-    scanDir(argv[1]);
+    listdir(argv[1],);
     return 0;
 }
