@@ -23,47 +23,53 @@ def getListOfFiles(dirName):
 def main():
 	route = argv[1]
 
-	temp = []
-	with open("virus_base.txt","r") as f:
-		line = f.readline().rstrip()
-		while line:
-			temp.append(line)
+	if route == "antivirus-update":
+		url = "https://raw.githubusercontent.com/ganixil/virus_database/master/virus_base.txt"
+		with urllib.request.urlopen(url) as response, open("virus_base", 'wb') as out_file:
+			data = response.read()
+			out_file.write(data)
+	else:
+		temp = []
+		with open("virus_base.txt","r") as f:
 			line = f.readline().rstrip()
-	virus = []	
-	for v in temp:
-		virus.append(bytes.fromhex(v))
+			while line:
+				temp.append(line)
+				line = f.readline().rstrip()
+		virus = []	
+		for v in temp:
+			virus.append(bytes.fromhex(v))
 
 
-	
-	if os.path.isfile(route):
-		size = os.path.getsize(route)
-		with open(route,"rb") as f:
-			for v in virus:
-				byte = f.read(len(v))
-				for i in range(1,size+1):
-					if byte == v:
-						print(route)
-						print("found virus",v)
-					f.seek(i)
-					byte = f.read(len(v))
-
-
-	elif os.path.isdir(route):
-		listOfFile = getListOfFiles(route)
-		for elem in listOfFile:
-			size = os.path.getsize(elem)
-			with open(elem,"rb") as f:
+		
+		if os.path.isfile(route):
+			size = os.path.getsize(route)
+			with open(route,"rb") as f:
 				for v in virus:
 					byte = f.read(len(v))
 					for i in range(1,size+1):
 						if byte == v:
-							print(elem)
+							print(route)
 							print("found virus",v)
 						f.seek(i)
 						byte = f.read(len(v))
 
-	else:
-		print("Directory Invalid")
+
+		elif os.path.isdir(route):
+			listOfFile = getListOfFiles(route)
+			for elem in listOfFile:
+				size = os.path.getsize(elem)
+				with open(elem,"rb") as f:
+					for v in virus:
+						byte = f.read(len(v))
+						for i in range(1,size+1):
+							if byte == v:
+								print(elem)
+								print("found virus",v)
+							f.seek(i)
+							byte = f.read(len(v))
+
+		else:
+			print("Directory Invalid")
 
 if __name__ == '__main__':
     main()
