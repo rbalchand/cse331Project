@@ -21,20 +21,31 @@ def getListOfFiles(dirName):
 def main():
 	route = argv[1]
 
+	virus = b'\x03\x00\x00\x80\x02\x00\x00\x00\x0f\x00\x00'
+
+
 	if os.path.isfile(route):
+		size = os.path.getsize(route)
 		with open(route,"rb") as f:
-				byte = f.read(10)
-				while byte:
-					byte = f.read(10)
-					print(byte)
+				byte = f.read(len(virus))
+				for i in range(1,size+1):
+					if byte == virus:
+						print("found")
+					f.seek(i)
+					byte = f.read(len(virus))
+
+
 	elif os.path.isdir(route):
 		listOfFile = getListOfFiles(route)
 		for elem in listOfFile:
+			size = os.path.getsize(elem)
 			with open(elem,"rb") as f:
-				byte = f.read(1)
-				while byte:
-					byte = f.read(1)
-					print(byte)
+				byte = f.read(len(virus))
+				for i in range(1,size+1):
+					if byte == virus:
+						print("found")
+					f.seek(i)
+					byte = f.read(len(virus))
 
 
 if __name__ == '__main__':
