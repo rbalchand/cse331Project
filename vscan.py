@@ -43,30 +43,44 @@ def main():
 		
 		if os.path.isfile(route):
 			size = os.path.getsize(route)
+			infected = False
 			with open(route,"rb") as f:
 				for v in virus:
 					byte = f.read(len(v))
 					for i in range(1,size+1):
 						if byte == v:
-							print(route)
-							print("found virus",v)
+							os.rename(route,route+".infected")
+							os.chmod(route+".infected",0o000)
+							infected = True
+							print("found virus",v,"at file",route)
+						if infected:
+							break
 						f.seek(i)
 						byte = f.read(len(v))
+					if infected:
+						break
 
 
 		elif os.path.isdir(route):
 			listOfFile = getListOfFiles(route)
 			for elem in listOfFile:
+				infected = False
 				size = os.path.getsize(elem)
 				with open(elem,"rb") as f:
 					for v in virus:
 						byte = f.read(len(v))
 						for i in range(1,size+1):
 							if byte == v:
-								print(elem)
-								print("found virus",v)
+								os.rename(elem,elem+".infected")
+								os.chmod(elem+".infected",0o000)
+								infected = True
+								print("found virus",v,"at file",elem)
+							if infected:
+								break
 							f.seek(i)
 							byte = f.read(len(v))
+						if infected:
+							break
 
 		else:
 			print("Directory Invalid")
